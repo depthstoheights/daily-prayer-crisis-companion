@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Prayer + Crisis Support Companion</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            max-width: 100vw;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 80px;
+        }
+
+        /* Audio Toggle */
+        .audio-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .audio-toggle:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 1);
+        }
+
+        /* Welcome Screen */
+        .welcome-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .welcome-content {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .app-logo {
+            font-size: 3em;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .app-title {
+            font-size: 2.2em;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .app-subtitle {
+            font-size: 1.1em;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .enter-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .enter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        /* Main App Screens */
+        .screen {
+            display: none;
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 100px;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Home Dashboard */
+        .dashboard {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .daily-verse {
+            font-size: 1.3em;
+            color: #333;
+            font-style: italic;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .verse-reference {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .dashboard-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .card-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .card-title {
+            font-size: 1.4em;
+            margin-bottom: 10px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .card-description {
+            color: #666;
+            line-height: 1.5;
+        }
+
+        /* Prayer Screens */
+        .prayer-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .prayer-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .prayer-title {
+            font-size: 2em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .prayer-time {
+            color: #667eea;
+            font-size: 1.1em;
+        }
+
+        .prayer-content {
+            font-size: 1.2em;
+            line-height: 1.8;
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .prayer-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.8);
+            color: #333;
+            border: 2px solid #667eea;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Crisis Support */
+        .crisis-container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .crisis-alert {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .crisis-alert h2 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+
+        .crisis-text {
+            font-size: 1.2em;
+            line-height: 1.6;
+        }
+
+        .scripture-grid {
+            display: grid;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .scripture-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .scripture-verse {
+            font-size: 1.3em;
+            font-style: italic;
+            color: #333;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .scripture-ref {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        /* Resources */
+        .resources-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .resource-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .prayer-list {
+            list-style: none;
+        }
+
+        .prayer-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .prayer-item:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateX(5px);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            flex: 1;
+            max-width: 80px;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .nav-icon {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+            color: #667eea;
+        }
+
+        .nav-label {
+            font-size: 0.8em;
+            color: #333;
+            font-weight: bold;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .modal-title {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .modal-text {
+            line-height: 1.6;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .donate-btn {
+            background: #0070ba;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 15px 0;
+            transition: all 0.3s ease;
+        }
+
+        .donate-btn:hover {
+            background: #005ea6;
+            transform: translateY(-2px);
+        }
+
+        /* Progress Tracking */
+        .progress-bar {
+            background: rgba(102, 126, 234, 0.2);
+            height: 10px;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        /* Success Messages */
+        .success-message {
+            background: linear-gradient(45deg, #48bb78, #38a169);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .success-message.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .welcome-content {
+                padding: 30px 20px;
+            }
+
+            .app-title {
+                font-size: 1.8em;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .prayer-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 200px;
+            }
+
+            .bottom-nav {
+                padding: 10px 0;
+            }
+
+            .nav-icon {
+                font-size: 1.3em;
+            }
+
+            .nav-label {
+                font-size: 0.7em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .app-container {
+                padding: 10px;
+                padding-bottom: 80px;
+            }
+
+            .prayer-container, .crisis-container, .resources-container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            .modal-content {
+                margin: 10px;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Audio Toggle -->
+        <button class="audio-toggle" onclick="toggleAudio()" id="audioToggle">
+            🎵
+        </button>
+
+        <!-- Background Audio -->
+        <audio id="backgroundAudio" loop>
+            <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+D2u2IdBTmX2+/TfCMEKoHU8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwGJHfH8N2QQAoUXrTp66hVFApGn+D2u2IdBjiR1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+D2u2IdBTmX2+/TfCMEKoHU8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwGJHfH8N2QQAoUXrTp66hVFApGn+D2u2IdBTmX2+/TfCMEKoHU8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwGJHfH8N2QQAoUXrTp66hVFApGn+D2u2IdBTmX2+/TfCMEKoHU8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwGJHfH8N2QQAoUXrTp66hVFApGn+D2u2IdBTmX2+/TfCMEKoHU8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwGJHfH8N2QQAoUXrTp66hVFApGn+D2u2IdBTmX2+/TfCMEKoHU8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwGJHfH8N2QQAoUXrTp66hVFApGn+D2u2Id" type="audio/wav">
+        </audio>
+
+        <!-- Welcome Screen -->
+        <div id="welcomeScreen" class="welcome-screen">
+            <div class="welcome-content">
+                <div class="app-logo">🙏</div>
+                <h1 class="app-title">Daily Prayer Companion</h1>
+                <p class="app-subtitle">Your daily spiritual guide with crisis support, prayer prompts, and uplifting scriptures</p>
+                <button class="enter-btn" onclick="enterApp()">Begin Your Journey</button>
+            </div>
+        </div>
+
+        <!-- Home Dashboard -->
+        <div id="homeScreen" class="screen">
+            <div class="dashboard">
+                <div class="dashboard-header">
+                    <div class="daily-verse" id="dailyVerse">"Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you wherever you go."</div>
+                    <div class="verse-reference">Joshua 1:9</div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number" id="prayerStreak">7</div>
+                            <div class="stat-label">Day Streak</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalPrayers">42</div>
+                            <div class="stat-label">Total Prayers</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="scriptureRead">15</div>
+                            <div class="stat-label">Scriptures Read</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="dashboard-card" onclick="showScreen('morningPrayer')">
+                        <span class="card-icon">🌅</span>
+                        <h3 class="card-title">Morning Prayer</h3>
+                        <p class="card-description">Start your day with guided morning prayers and psalms</p>
+                    </div>
+
+                    <div class="dashboard-card" onclick="showScreen('eveningPrayer')">
+                        <span class="card-icon">🌙</span>
+                        <h3 class="card-title">Evening Prayer</h3>
+                        <p class="card-description">End your day with peaceful evening prayers</p>
+                    </div>
+
+                    <div class="dashboard-card" onclick="showScreen('dailyPrompt')">
+                        <span class="card-icon">✨</span>
+                        <h3 class="card-title">Daily Prompt</h3>
+                        <p class="card-description">Receive your personalized prayer prompt for today</p>
+                    </div>
+
+                    <div class="dashboard-card" onclick="showScreen('emergencyPrayer')">
+                        <span class="card-icon">🆘</span>
+                        <h3 class="card-title">Emergency Prayer</h3>
+                        <p class="card-description">Quick access to comforting prayers for difficult moments</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Morning Prayer Screen -->
+        <div id="morningPrayer" class="screen">
+            <div class="prayer-container">
+                <div class="prayer-header">
+                    <h2 class="prayer-title">Morning Prayer</h2>
+                    <div class="prayer-time" id="morningTime">Good Morning! 🌅</div>
+                </div>
+                
+                <div class="prayer-content" id="morningPrayerContent">
+                    "Lord, as I begin this new day, I thank You for the gift of life and breath. Guide my steps, guard my heart, and help me to be a light to others. Grant me wisdom in my decisions, strength for my challenges, and peace in my spirit. May Your presence go before me and Your love surround me throughout this day. Amen."
+                </div>
+
+                <div class="prayer-actions">
+                    <button class="btn btn-primary" onclick="completePrayer('morning')">Prayer Complete</button>
+                    <button class="btn btn-secondary" onclick="nextMorningPrayer()">Next Prayer</button>
+                </div>
+
+                <div id="morningSuccess" class="success-message">
+                    ✅ Morning prayer completed! Your day is blessed.
+                </div>
+            </div>
+        </div>
+
+        <!-- Evening Prayer Screen -->
+        <div id="eveningPrayer" class="screen">
+            <div class="prayer-container">
+                <div class="prayer-header">
+                    <h2 class="prayer-title">Evening Prayer</h2>
+                    <div class="prayer-time" id="eveningTime">Good Evening! 🌙</div>
+                </div>
+                
+                <div class="prayer-content" id="eveningPrayerContent">
+                    "Heavenly Father, as this day comes to an end, I come before You with a grateful heart. Thank You for Your faithfulness throughout today. Forgive me where I have fallen short, and help me to rest in Your grace. Watch over my loved ones through the night, and prepare my heart for tomorrow's opportunities to serve You. Grant me peaceful sleep and sweet dreams. Amen."
+                </div>
+
+                <div class="prayer-actions">
+                    <button class="btn btn-primary" onclick="completePrayer('evening')">Prayer Complete</button>
+                    <button class="btn btn-secondary" onclick="nextEveningPrayer()">Next Prayer</button>
+                </div>
+
+                <div id="eveningSuccess" class="success-message">
+                    ✅ Evening prayer completed! Rest well in His peace.
+                </div>
+            </div>
+        </div>
+
+        <!-- Daily Prompt Screen -->
+        <div id="dailyPrompt" class="screen">
+            <div class="prayer-container">
+                <div class="prayer-header">
+                    <h2 class="prayer-title">Daily Prayer Prompt</h2>
+                    <div class="prayer-time">Today's Focus</div>
+                </div>
+                
+                <div class="prayer-content" id="dailyPromptContent">
+                    <strong>Gratitude & Trust</strong><br><br>
+                    Today, focus your prayers on gratitude for God's provision and trust in His plan for your life. Reflect on three specific things you're grateful for and surrender any worries to His care.
+                    <br><br>
+                    <em>"Give thanks in all circumstances; for this is God's will for you in Christ Jesus." - 1 Thessalonians 5:18</em>
+                </div>
+
+                <div class="prayer-actions">
+                    <button class="btn btn-primary" onclick="completePrayer('prompt')">Prayed About This</button>
+                    <button class="btn btn-secondary" onclick="nextDailyPrompt()">New Prompt</button>
+                </div>
+
+                <div id="promptSuccess" class="success-message">
+                    ✅ Daily prompt completed! Your heart is aligned with His.
+                </div>
+            </div>
+        </div>
+
+        <!-- Emergency Prayer Screen -->
+        <div id="emergencyPrayer" class="screen">
+            <div class="prayer-container">
+                <div class="prayer-header">
+                    <h2 class="prayer-title">Emergency Prayer</h2>
+                    <div class="prayer-time">God is with you right now 💙</div>
+                </div>
+                
+                <div class="prayer-content" id="emergencyPrayerContent">
+                    "Lord, I come to You in this moment of need. You know my heart and my struggles. Please fill me with Your peace that surpasses understanding. Give me strength to face this challenge and remind me that You are always with me. Help me to trust in Your perfect timing and plan. Wrap me in Your love and comfort. I am safe in Your hands. Amen."
+                </div>
+
+                <div class="prayer-actions">
+                    <button class="btn btn-primary" onclick="completePrayer('emergency')">Find Peace</button>
+                    <button class="btn btn-secondary" onclick="nextEmergencyPrayer()">Another Prayer</button>
+                </div>
+
+                <div id="emergencySuccess" class="success-message">
+                    ✅ You are loved and never alone. God's peace is with you.
+                </div>
+            </div>
+        </div>
+
+        <!-- Crisis Support Screen -->
+        <div id="crisisScreen" class="screen">
+            <div class="crisis-container">
+                <div class="crisis-alert">
+                    <h2>🆘 Crisis Support</h2>
+                    <div class="crisis-text">
+                        If you are in crisis, please contact your local helpline for immediate support.
+                        You are not alone, and help is available.
+                    </div>
+                </div>
+
+                <div class="scripture-grid">
+                    <div class="scripture-card">
+                        <div class="scripture-verse">"The Lord is close to the brokenhearted and saves those who are crushed in spirit."</div>
+                        <div class="scripture-ref">Psalm 34:18</div>
+                    </div>
+
+                    <div class="scripture-card">
+                        <div class="scripture-verse">"Cast all your anxiety on him because he cares for you."</div>
+                        <div class="scripture-ref">1 Peter 5:7</div>
+                    </div>
+
+                    <div class="scripture-card">
+                        <div class="scripture-verse">"Even though I walk through the darkest valley, I will fear no evil, for you are with me."</div>
+                        <div class="scripture-ref">Psalm 23:4</div>
+                    </div>
+
+                    <div class="scripture-card">
+                        <div class="scripture-verse">"Come to me, all you who are weary and burdened, and I will give you rest."</div>
+                        <div class="scripture-ref">Matthew 11:28</div>
+                    </div>
+
+                    <div class="scripture-card">
+                        <div class="scripture-verse">"And we know that in all things God works for the good of those who love him."</div>
+                        <div class="scripture-ref">Romans 8:28</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resources Screen -->
+        <div id="resourcesScreen" class="screen">
+            <div class="resources-container">
+                <div class="resource-section">
+                    <h2 class="section-title">
+                        📖 Scripture Library
+                    </h2>
+                    <ul class="prayer-list">
+                        <li class="prayer-item" onclick="loadScripture('comfort')">
+                            <strong>Comfort & Peace</strong><br>
+                            Verses for when you need God's comfort
+                        </li>
+                        <li class="prayer-item" onclick="loadScripture('strength')">
+                            <strong>Strength & Courage</strong><br>
+                            Biblical encouragement for difficult times
+                        </li>
+                        <li class="prayer-item" onclick="loadScripture('guidance')">
+                            <strong>Guidance & Wisdom</strong><br>
+                            Scriptures for decision making
+                        </li>
+                        <li class="prayer-item" onclick="loadScripture('gratitude')">
+                            <strong>Gratitude & Praise</strong><br>
+                            Verses to inspire thankfulness
+                        </li>
+                        <li class="prayer-item" onclick="loadScripture('protection')">
+                            <strong>Protection & Safety</strong><br>
+                            God's promises of protection
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="resource-section">
+                    <h2 class="section-title">
+                        🎯 Prayer Focus Areas
+                    </h2>
+                    <ul class="prayer-list">
+                        <li class="prayer-item" onclick="loadPrayerFocus('family')">
+                            <strong>Family & Relationships</strong><br>
+                            Prayers for loved ones and connections
+                        </li>
+                        <li class="prayer-item" onclick="loadPrayerFocus('work')">
+                            <strong>Work & Purpose</strong><br>
+                            Finding meaning in your calling
+                        </li>
+                        <li class="prayer-item" onclick="loadPrayerFocus('health')">
+                            <strong>Health & Healing</strong><br>
+                            Physical and emotional wellness
+                        </li>
+                        <li class="prayer-item" onclick="loadPrayerFocus('growth')">
+                            <strong>Spiritual Growth</strong><br>
+                            Deepening your faith journey
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="resource-section">
+                    <h2 class="section-title">
+                        📊 Prayer Progress
+                    </h2>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 70%"></div>
+                    </div>
+                    <p style="text-align: center; color: #666; margin-top: 10px;">
+                        You've completed 70% of this week's prayer goals!
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Modal -->
+        <div id="infoModal" class="modal">
+            <div class="modal-content">
+                <button class="modal-close" onclick="closeModal('infoModal')">×</button>
+                <h2 class="modal-title">📱 App Information</h2>
+                
+                <div class="modal-text">
+                    <strong>What this app does:</strong><br>
+                    Daily Prayer + Crisis Support Companion provides daily prayer prompts, emergency scriptures, and spiritual support for your faith journey.
+                </div>
+
+                <div class="modal-text">
+                    <strong>How to use:</strong><br>
+                    • Start each day with Morning Prayer<br>
+                    • Get personalized daily prayer prompts<br>
+                    • Access emergency prayers and crisis support<br>
+                    • End your day with Evening Prayer<br>
+                    • Explore scripture library and resources
+                </div>
+
+                <div class="modal-text">
+                    <strong>Install on your phone:</strong><br>
+                    📱 <strong>iPhone:</strong> Tap Share → Add to Home Screen<br>
+                    📱 <strong>Android:</strong> Tap Menu → Add to Home Screen
+                </div>
+
+                <div class="modal-text">
+                    This app works offline and saves your prayer progress locally on your device.
+                </div>
+            </div>
+        </div>
+
+        <!-- About Modal -->
+        <div id="aboutModal" class="modal">
+            <div class="modal-content">
+                <button class="modal-close" onclick="closeModal('aboutModal')">×</button>
+                <h2 class="modal-title">ℹ️ About</h2>
+                
+                <div class="modal-text">
+                    <strong>Made by Justin</strong><br>
+                    Depths to Heights
+                </div>
+
+                <div class="modal-text">
+                    <strong>Website:</strong><br>
+                    <a href="https://depthstoheights.org" target="_blank" style="color: #667eea;">https://depthstoheights.org</a>
+                </div>
+
+                <div class="modal-text">
+                    <strong>Contact:</strong><br>
+                    <a href="mailto:depthstoheights@gmail.com" style="color: #667eea;">depthstoheights@gmail.com</a>
+                </div>
+
+                <button class="donate-btn" onclick="window.open('https://www.paypal.com/donate/?hosted_button_id=8GRE7B8C3TP2U', '_blank')">
+                    💝 Donate via PayPal
+                </button>
+
+                <div class="modal-text">
+                    <strong>Our Mission:</strong><br>
+                    We create digital tools to support spiritual growth, crisis intervention, and faith-based wellness. Our apps are designed to provide immediate spiritual support and daily encouragement for people seeking to deepen their relationship with God.
+                </div>
+
+                <div class="modal-text" style="font-size: 0.9em; color: #999;">
+                    Version 1.0 | © 2024 Depths to Heights
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <div class="nav-item active" onclick="showScreen('homeScreen')">
+                <div class="nav-icon">🏠</div>
+                <div class="nav-label">Home</div>
+            </div>
+            <div class="nav-item" onclick="showScreen('crisisScreen')">
+                <div class="nav-icon">🆘</div>
+                <div class="nav-label">Crisis</div>
+            </div>
+            <div class="nav-item" onclick="showScreen('resourcesScreen')">
+                <div class="nav-icon">📚</div>
+                <div class="nav-label">Resources</div>
+            </div>
+            <div class="nav-item" onclick="showModal('infoModal')">
+                <div class="nav-icon">ℹ️</div>
+                <div class="nav-label">Info</div>
+            </div>
+            <div class="nav-item" onclick="showModal('aboutModal')">
+                <div class="nav-icon">👤</div>
+                <div class="nav-label">About</div>
+            </div>
+        </nav>
+    </div>
+
+    <script>
+        // App State
+        let appData = {
+            prayerStreak: 7,
+            totalPrayers: 42,
+            scripturesRead: 15,
+            lastPrayerDate: new Date().toDateString(),
+            completedToday: {
+                morning: false,
+                evening: false,
+                prompt: false,
+                emergency: false
+            },
+            currentPrayerIndex: {
+                morning: 0,
+                evening: 0,
+                prompt: 0,
+                emergency: 0
+            }
+        };
+
+        // Prayer Content Arrays
+        const morningPrayers = [
+            "Lord, as I begin this new day, I thank You for the gift of life and breath. Guide my steps, guard my heart, and help me to be a light to others. Grant me wisdom in my decisions, strength for my challenges, and peace in my spirit. May Your presence go before me and Your love surround me throughout this day. Amen.",
+            "Heavenly Father, I awake with gratitude for Your mercy that is new every morning. Help me to walk in Your ways today, to show kindness to those I meet, and to trust in Your perfect plan. Fill me with Your Spirit and let my life be a testimony of Your goodness. Bless this day and make it fruitful for Your kingdom. Amen.",
+            "Dear God, thank You for watching over me through the night and giving me another day to serve You. Help me to be mindful of Your presence in every moment. Guide my words, thoughts, and actions that they may honor You. Give me courage to face any challenges and a heart full of joy for the blessings You provide. Amen."
+        ];
+
+        const eveningPrayers = [
+            "Heavenly Father, as this day comes to an end, I come before You with a grateful heart. Thank You for Your faithfulness throughout today. Forgive me where I have fallen short, and help me to rest in Your grace. Watch over my loved ones through the night, and prepare my heart for tomorrow's opportunities to serve You. Grant me peaceful sleep and sweet dreams. Amen.",
+            "Lord, I thank You for being with me throughout this day. For the moments of joy, I praise You. For the challenges, I thank You for Your strength. As I prepare for rest, I surrender my worries to You. Help me to sleep peacefully, knowing that You are in control. Refresh my body and spirit for tomorrow. Amen.",
+            "Dear God, as the day draws to a close, I reflect on Your goodness and mercy. Thank You for the people who crossed my path today and for the opportunities to show Your love. Forgive any shortcomings and help me to grow in Your likeness. Guard my family and friends tonight, and let Your peace fill our hearts. Amen."
+        ];
+
+        const dailyPrompts = [
+            {
+                title: "Gratitude & Trust",
+                content: "Today, focus your prayers on gratitude for God's provision and trust in His plan for your life. Reflect on three specific things you're grateful for and surrender any worries to His care.",
+                verse: "Give thanks in all circumstances; for this is God's will for you in Christ Jesus. - 1 Thessalonians 5:18"
+            },
+            {
+                title: "Love & Forgiveness", 
+                content: "Pray for the ability to love others as Christ loves you, and seek forgiveness for any ways you've fallen short. Consider someone you need to forgive and ask God to help you release any bitterness.",
+                verse: "Be kind and compassionate to one another, forgiving each other, just as in Christ God forgave you. - Ephesians 4:32"
+            },
+            {
+                title: "Wisdom & Guidance",
+                content: "Ask God for wisdom in the decisions you face today. Pray for clarity in your relationships, work, and spiritual journey. Trust that He will direct your steps.",
+                verse: "Trust in the Lord with all your heart and lean not on your own understanding; in all your ways submit to him, and he will make your paths straight. - Proverbs 3:5-6"
+            }
+        ];
+
+        const emergencyPrayers = [
+            "Lord, I come to You in this moment of need. You know my heart and my struggles. Please fill me with Your peace that surpasses understanding. Give me strength to face this challenge and remind me that You are always with me. Help me to trust in Your perfect timing and plan. Wrap me in Your love and comfort. I am safe in Your hands. Amen.",
+            "Heavenly Father, I feel overwhelmed right now, but I know You are my refuge and strength. Help me to feel Your presence and to remember that nothing is too difficult for You. Give me the courage to take the next step and the faith to believe that You are working all things together for good. Calm my spirit and fill me with Your peace. Amen.",
+            "Dear God, in this moment of anxiety and fear, I turn to You as my source of hope. Remind me of Your promises and Your unfailing love. Help me to cast all my cares upon You, knowing that You care for me deeply. Give me strength for today and hope for tomorrow. Let Your peace guard my heart and mind. Amen."
+        ];
+
+        const dailyVerses = [
+            {
+                verse: "Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you wherever you go.",
+                reference: "Joshua 1:9"
+            },
+            {
+                verse: "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, to give you hope and a future.",
+                reference: "Jeremiah 29:11"
+            },
+            {
+                verse: "The Lord your God is with you, the Mighty Warrior who saves. He will take great delight in you; in his love he will no longer rebuke you, but will rejoice over you with singing.",
+                reference: "Zephaniah 3:17"
+            }
+        ];
+
+        // Initialize app
+        function initializeApp() {
+            loadAppData();
+            updateStats();
+            setDailyVerse();
+            updateTime();
+            setInterval(updateTime, 60000); // Update time every minute
+        }
+
+        // Enter app from welcome screen
+        function enterApp() {
+            document.getElementById('welcomeScreen').style.display = 'none';
+            showScreen('homeScreen');
+        }
+
+        // Screen navigation
+        function showScreen(screenId) {
+            // Hide all screens
+            const screens = document.querySelectorAll('.screen');
+            screens.forEach(screen => screen.classList.remove('active'));
+            
+            // Show target screen
+            document.getElementById(screenId).classList.add('active');
+            
+            // Update navigation
+            updateNavigation(screenId);
+        }
+
+        function updateNavigation(activeScreen) {
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            // Map screen to nav item
+            const navMap = {
+                'homeScreen': 0,
+                'crisisScreen': 1,
+                'resourcesScreen': 2
+            };
+            
+            if (navMap[activeScreen] !== undefined) {
+                navItems[navMap[activeScreen]].classList.add('active');
+            }
+        }
+
+        // Modal functions
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Audio controls
+        let audioPlaying = false;
+        function toggleAudio() {
+            const audio = document.getElementById('backgroundAudio');
+            const button = document.getElementById('audioToggle');
+            
+            if (audioPlaying) {
+                audio.pause();
+                button.textContent = '🔇';
+                audioPlaying = false;
+            } else {
+                audio.play();
+                button.textContent = '🎵';
+                audioPlaying = true;
+            }
+        }
+
+        // Prayer completion
+        function completePrayer(type) {
+            appData.completedToday[type] = true;
+            appData.totalPrayers++;
+            
+            // Update streak if it's a new day
+            const today = new Date().toDateString();
+            if (appData.lastPrayerDate !== today) {
+                appData.prayerStreak++;
+                appData.lastPrayerDate = today;
+            }
+            
+            saveAppData();
+            updateStats();
+            showSuccessMessage(type);
+        }
+
+        function showSuccessMessage(type) {
+            const messageId = type + 'Success';
+            const message = document.getElementById(messageId);
+            if (message) {
+                message.classList.add('show');
+                setTimeout(() => {
+                    message.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        // Prayer cycling functions
+        function nextMorningPrayer() {
+            appData.currentPrayerIndex.morning = (appData.currentPrayerIndex.morning + 1) % morningPrayers.length;
+            document.getElementById('morningPrayerContent').textContent = morningPrayers[appData.currentPrayerIndex.morning];
+            saveAppData();
+        }
+
+        function nextEveningPrayer() {
+            appData.currentPrayerIndex.evening = (appData.currentPrayerIndex.evening + 1) % eveningPrayers.length;
+            document.getElementById('eveningPrayerContent').textContent = eveningPrayers[appData.currentPrayerIndex.evening];
+            saveAppData();
+        }
+
+        function nextDailyPrompt() {
+            appData.currentPrayerIndex.prompt = (appData.currentPrayerIndex.prompt + 1) % dailyPrompts.length;
+            const prompt = dailyPrompts[appData.currentPrayerIndex.prompt];
+            document.getElementById('dailyPromptContent').innerHTML = 
+                `<strong>${prompt.title}</strong><br><br>${prompt.content}<br><br><em>"${prompt.verse}"</em>`;
+            saveAppData();
+        }
+
+        function nextEmergencyPrayer() {
+            appData.currentPrayerIndex.emergency = (appData.currentPrayerIndex.emergency + 1) % emergencyPrayers.length;
+            document.getElementById('emergencyPrayerContent').textContent = emergencyPrayers[appData.currentPrayerIndex.emergency];
+            saveAppData();
+        }
+
+        // Resource functions
+        function loadScripture(category) {
+            const scriptures = {
+                comfort: [
+                    { verse: "The Lord is close to the brokenhearted and saves those who are crushed in spirit.", ref: "Psalm 34:18" },
+                    { verse: "Cast all your anxiety on him because he cares for you.", ref: "1 Peter 5:7" },
+                    { verse: "Peace I leave with you; my peace I give you.", ref: "John 14:27" }
+                ],
+                strength: [
+                    { verse: "I can do all this through him who gives me strength.", ref: "Philippians 4:13" },
+                    { verse: "The Lord is my strength and my shield; my heart trusts in him.", ref: "Psalm 28:7" },
+                    { verse: "Be strong and courageous! Do not be afraid or discouraged.", ref: "Joshua 1:9" }
+                ],
+                guidance: [
+                    { verse: "Trust in the Lord with all your heart and lean not on your own understanding.", ref: "Proverbs 3:5" },
+                    { verse: "Your word is a lamp for my feet, a light on my path.", ref: "Psalm 119:105" },
+                    { verse: "If any of you lacks wisdom, you should ask God.", ref: "James 1:5" }
+                ],
+                gratitude: [
+                    { verse: "Give thanks in all circumstances; for this is God's will for you.", ref: "1 Thessalonians 5:18" },
+                    { verse: "Every good and perfect gift is from above.", ref: "James 1:17" },
+                    { verse: "Enter his gates with thanksgiving and his courts with praise.", ref: "Psalm 100:4" }
+                ],
+                protection: [
+                    { verse: "The Lord will keep you from all harm—he will watch over your life.", ref: "Psalm 121:7" },
+                    { verse: "God is our refuge and strength, an ever-present help in trouble.", ref: "Psalm 46:1" },
+                    { verse: "No weapon forged against you will prevail.", ref: "Isaiah 54:17" }
+                ]
+            };
+            
+            showScriptureModal(category, scriptures[category]);
+        }
+
+        function showScriptureModal(category, verses) {
+            let content = `<h3>${category.charAt(0).toUpperCase() + category.slice(1)} Scriptures</h3>`;
+            verses.forEach(scripture => {
+                content += `<div style="margin: 20px 0; padding: 15px; background: rgba(102, 126, 234, 0.1); border-radius: 10px;">
+                    <div style="font-style: italic; margin-bottom: 10px;">"${scripture.verse}"</div>
+                    <div style="color: #667eea; font-weight: bold;">${scripture.ref}</div>
+                </div>`;
+            });
+            
+            // Create temporary modal
+            const modal = document.createElement('div');
+            modal.className = 'modal active';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <button class="modal-close" onclick="this.closest('.modal').remove()">×</button>
+                    ${content}
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function loadPrayerFocus(category) {
+            const focuses = {
+                family: "Pray for your family relationships, for unity, love, and understanding. Ask God to bless your loved ones and strengthen your bonds.",
+                work: "Pray for your work and career, for wisdom in your professional life, and for opportunities to serve others through your calling.",
+                health: "Pray for physical, mental, and emotional health. Ask for healing where needed and strength to care for your body as God's temple.",
+                growth: "Pray for spiritual growth, for deeper understanding of God's word, and for transformation into Christ's likeness."
+            };
+            
+            showPrayerFocusModal(category, focuses[category]);
+        }
+
+        function showPrayerFocusModal(category, focus) {
+            const modal = document.createElement('div');
+            modal.className = 'modal active';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <button class="modal-close" onclick="this.closest('.modal').remove()">×</button>
+                    <h3>${category.charAt(0).toUpperCase() + category.slice(1)} Prayer Focus</h3>
+                    <p style="line-height: 1.6; margin: 20px 0;">${focus}</p>
+                    <button class="btn btn-primary" onclick="this.closest('.modal').remove()">Begin Praying</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Data persistence
+        function saveAppData() {
+            localStorage.setItem('prayerAppData', JSON.stringify(appData));
+        }
+
+        function loadAppData() {
+            const saved = localStorage.getItem('prayerAppData');
+            if (saved) {
+                appData = { ...appData, ...JSON.parse(saved) };
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('prayerStreak').textContent = appData.prayerStreak;
+            document.getElementById('totalPrayers').textContent = appData.totalPrayers;
+            document.getElementById('scriptureRead').textContent = appData.scripturesRead;
+        }
+
+        function setDailyVerse() {
+            const today = new Date().getDate();
+            const verseIndex = today % dailyVerses.length;
+            const dailyVerse = dailyVerses[verseIndex];
+            document.getElementById('dailyVerse').textContent = `"${dailyVerse.verse}"`;
+            document.querySelector('.verse-reference').textContent = dailyVerse.reference;
+        }
+
+        function updateTime() {
+            const now = new Date();
+            const hour = now.getHours();
+            
+            if (hour < 12) {
+                document.getElementById('morningTime').textContent = 'Good Morning! 🌅';
+            } else {
+                document.getElementById('eveningTime').textContent = 'Good Evening! 🌙';
+            }
+        }
+
+        // Initialize app when page loads
+        document.addEventListener('DOMContentLoaded', initializeApp);
+
+        // Close modals when clicking outside
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
